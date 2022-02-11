@@ -9,7 +9,7 @@ app.get('/bla/:man/:woman', (req, res) => {     //http://localhost:3000/bla/pety
     res.send('ok');
 });
 
-const numbers = [
+const contacts = [
     {
         name: 'Scarlet',
         number: '89128762312'
@@ -40,14 +40,14 @@ const numbers = [
     },
 ];
 
-app.get('/numberBook', (req, res) => {
+app.get('/phoneBook', (req, res) => {
     /* res.send(
-        numbers.forEach(elem => {
+        contacts.forEach(elem => {
             elem.name;
         })
     ); */
     let list = '';
-    numbers.forEach(elem => {
+    contacts.forEach(elem => {
         list += `${elem.name}: ${elem.number} <br>`;
     })
     res.send(list);
@@ -57,33 +57,53 @@ app.get('/phoneBook/addNumber/:name/:number', (req, res) => {
     let name = req.params.name;
     let number = req.params.number;
     let convertedNumber = convertStrToNumber(number);
-    if (convertedNumber) {
+    if (convertedNumber && name != '') {
         if (validateNumber(convertedNumber)) {
-            addNumber(name, phone);
+            addNumber(name, number);
             res.send(`Создан новый контакт: ${name}, ${number}`);
         } else res.send('invalid number number');
     } else res.send('incorrect input');
 });
 
 function addNumber(name, number) {
-    numbers.push({
+    contacts.push({
         name,
         number
     });
 }
 
-app.get('/phoneBook/deleteNumber/:name', (req, res) => {
+/* app.get('/phoneBook/deleteNumber/:name', (req, res) => {
     let name = req.params.name;
     if (name) {
         deleteNumber(name);
         res.send('Контакт удален');
     } else res.send('Контакт с таким именем не найден');
+}); */
+
+app.get('/phoneBook/deleteNumber/:prop', (req, res) => {
+    let prop = req.params.prop;
+    convertedNumber = convertStrToNumber(prop);
+    if (convertedNumber) {
+        if (deleteNumber(prop, 'number')) {
+            res.send('Контакт удален по номеру');
+        }
+    } else if (deleteNumber(prop, 'name')) {
+        res.send('Контакт удален по имени');
+    } else res.send('Контакт с таким именем не найден');
 });
 
-function deleteNumber(name) {
-    numbers.forEach(elem => { if (elem.name === name) elem = {}; });
+function deleteNumber(prop, propName = 'name') {
+    console.log('Мы в функции deleteNumber');
+    contacts.forEach(elem => {
+        console.log('Мы в цикле функции deleteNumber');
+        if (elem[propName] === prop) {
+            elem = {};
+            console.log('Мы в условии цикла функции deleteNumber');
+            return true;
+        }
+    });
+    return false;
 }
-
 
 function convertStrToNumber(str) {
     let convertedNumber = '';
