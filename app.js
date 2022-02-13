@@ -3,12 +3,6 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
-let i = 0;
-app.get('/bla/:man/:woman', (req, res) => {     //http://localhost:3000/bla/petya/mila
-    const { man, woman } = req.params;          //присваеваем переменным имена которые впишем в гетовое строке
-    res.send('ok');
-});
-
 const contacts = [
     {
         name: 'Scarlet',
@@ -61,7 +55,7 @@ app.get('/phoneBook/addNumber/:name/:number', (req, res) => {
         if (validateNumber(convertedNumber)) {
             addNumber(name, number);
             res.send(`Создан новый контакт: ${name}, ${number}`);
-        } else res.send('invalid number number');
+        } else res.send('invalid number');
     } else res.send('incorrect input');
 });
 
@@ -85,24 +79,22 @@ app.get('/phoneBook/deleteNumber/:prop', (req, res) => {
     convertedNumber = convertStrToNumber(prop);
     if (convertedNumber) {
         if (deleteNumber(prop, 'number')) {
-            res.send('Контакт удален по номеру');
+            res.send('Контакт удален');
         }
     } else if (deleteNumber(prop, 'name')) {
-        res.send('Контакт удален по имени');
-    } else res.send('Контакт с таким именем не найден');
+        res.send('Контакт удален');
+    } else res.send('Контакт не найден');
 });
 
 function deleteNumber(prop, propName = 'name') {
-    console.log('Мы в функции deleteNumber');
+    let flag = false;
     contacts.forEach(elem => {
-        console.log('Мы в цикле функции deleteNumber');
-        if (elem[propName] === prop) {
+        if (elem[propName] == prop) {
             elem = {};
-            console.log('Мы в условии цикла функции deleteNumber');
-            return true;
+            flag = true;
         }
     });
-    return false;
+    return flag;
 }
 
 function convertStrToNumber(str) {
